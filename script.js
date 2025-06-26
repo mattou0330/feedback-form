@@ -111,6 +111,7 @@ $(document).ready(function() {
             formData.append('image', imageFile);
         }
         $('#submitBtn').prop('disabled', true).text('送信中...');
+        
         $.ajax({
             url: 'submit.php',
             type: 'POST',
@@ -155,20 +156,17 @@ $(document).ready(function() {
 
     // エラー時のアラートを表示する関数
     function showError(message) {
-        $('#errorMessage').text(message);
-        $('#errorAlert').removeClass('translate-x-full');
-        
-        setTimeout(function() {
-            $('#errorAlert').addClass('translate-x-full');
-        }, 5000);
+        alert('エラー: ' + message);
     }
 
-    // ページ表示時にフォームを隠す
-    $('#feedbackForm').hide();
-    $('h1').hide();
+    // ページ表示時にフォームを表示（パスワード認証を一時的に無効化）
+    $('#feedbackForm').show();
+    $('h1').show();
     $('#completeMessage').hide();
+    $('#passwordModal').hide(); // パスワードモーダルを非表示
 
-    // パスワード認証処理
+    // パスワード認証処理（一時的に無効化）
+    /*
     $('#passwordSubmit').on('click', function() {
         const pw = $('#accessPassword').val();
         if (pw === 'maimai') {
@@ -185,6 +183,7 @@ $(document).ready(function() {
             $('#passwordSubmit').click();
         }
     });
+    */
 
     // ページ読み込み時に初期チェックを行う
     validateForm();

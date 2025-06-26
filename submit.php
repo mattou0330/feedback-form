@@ -5,6 +5,7 @@ header('Content-Type: application/json; charset=utf-8');
 // デバッグ用：エラーを表示（本番環境では無効にする）
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 // 設定（アップロード先やファイルサイズなど）
 $uploadDir = __DIR__ . '/uploads/'; // 画像を保存するディレクトリ
