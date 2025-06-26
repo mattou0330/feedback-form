@@ -120,15 +120,16 @@ $(document).ready(function() {
             contentType: false,
             success: function(response) {
                 if (response.status === 'ok') {
+                    // 送信完了メッセージを表示
                     let html = '<h2 class="text-xl font-bold mb-4">送信完了いたしました。</h2>';
                     html += '<p class="mb-6">メッセージをお送りいただきありがとうございます。<br>ご要望や問題点は速やかに確認し、改善に励みます。</p>';
-                    html += '<button id="backToTop" class="mt-6 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">トップ</button>';
+                    
                     $('#feedbackForm').hide();
                     $('h1').hide();
                     $('#completeMessage').html(html).show();
-                    $('#backToTop').on('click', function() {
-                        location.href = './index.html';
-                    });
+                    
+                    // 過去の投稿履歴を読み込んで表示
+                    loadPastReports();
                 } else {
                     showError(response.message || 'エラーが発生しました。');
                 }
@@ -184,6 +185,82 @@ $(document).ready(function() {
         }
     });
     */
+
+    // 過去の投稿履歴を読み込んで表示する関数
+    function loadPastReports() {
+        $.ajax({
+            url: 'read.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'ok' && response.data && response.data.length > 0) {
+                    let historyHtml = '<div class="mt-8 border-t pt-6">';
+                    historyHtml += '<h3 class="text-lg font-bold mb-4">過去の投稿履歴</h3>';
+                    historyHtml += '<div class="space-y-4 max-h-96 overflow-y-auto">';
+                    
+                    // 最新のものから順に表示（配列を逆順にする）
+                    const reversedData = response.data.slice().reverse();
+                    
+                    reversedData.forEach(function(row, index) {
+                        if (row.length >= 3) {
+                            const timestamp = row[0] || '';
+                            const category = row[1] || '';
+                            const message = row[2] || '';
+                            const image = row[3] || '';
+                            
+                            historyHtml += '<div class="bg-gray-50 p-4 rounded-lg border">';
+                            historyHtml += '<div class="flex justify-between items-start mb-2">';
+                            historyHtml += '<span class="text-sm font-medium text-blue-600">' + escapeHtml(category) + '</span>';
+                            historyHtml += '<span class="text-xs text-gray-500">' + escapeHtml(timestamp) + '</span>';
+                            historyHtml += '</div>';
+                            historyHtml += '<p class="text-sm text-gray-700 whitespace-pre-wrap">' + escapeHtml(message) + '</p>';
+                            
+                            if (image) {
+                                historyHtml += '<div class="mt-2">';
+                                historyHtml += '<span class="text-xs text-gray-500">画像: ' + escapeHtml(image) + '</span>';
+                                historyHtml += '</div>';
+                            }
+                            historyHtml += '</div>';
+                        }
+                    });
+                    
+                    historyHtml += '</div>';
+                    historyHtml += '</div>';
+                    historyHtml += '<button id="backToTop" class="mt-6 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">トップ</button>';
+                    
+                    $('#completeMessage').append(historyHtml);
+                    
+                    // トップボタンのイベント
+                    $('#backToTop').on('click', function() {
+                        location.href = './index.html';
+                    });
+                } else {
+                    // データがない場合もトップボタンを表示
+                    let buttonHtml = '<button id="backToTop" class="mt-6 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">トップ</button>';
+                    $('#completeMessage').append(buttonHtml);
+                    $('#backToTop').on('click', function() {
+                        location.href = './index.html';
+                    });
+                }
+            },
+            error: function() {
+                console.error('投稿履歴の読み込みに失敗しました');
+                // エラーでもトップボタンを表示
+                let buttonHtml = '<button id="backToTop" class="mt-6 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">トップ</button>';
+                $('#completeMessage').append(buttonHtml);
+                $('#backToTop').on('click', function() {
+                    location.href = './index.html';
+                });
+            }
+        });
+    }
+
+    // HTMLエスケープ関数
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
     // ページ読み込み時に初期チェックを行う
     validateForm();
