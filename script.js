@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const completeMessage = document.getElementById('completeMessage');
     const confirmModal = document.getElementById('confirmModal');
     const passwordModal = document.getElementById('passwordModal');
+    const passwordSubmit = document.getElementById('passwordSubmit');
+    const accessPassword = document.getElementById('accessPassword');
+    const passwordError = document.getElementById('passwordError');
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
 
@@ -181,31 +184,35 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('エラー: ' + message);
     }
 
-    // ページ表示時にフォームを表示（パスワード認証を一時的に無効化）
-    feedbackForm.style.display = 'block';
-    document.querySelector('h1').style.display = 'block';
+    // ページ表示時にフォームを隠す（パスワード認証有効）
+    feedbackForm.style.display = 'none';
+    document.querySelector('h1').style.display = 'none';
     completeMessage.style.display = 'none';
-    passwordModal.style.display = 'none'; // パスワードモーダルを非表示
+    passwordModal.style.display = 'flex'; // パスワードモーダルを表示
 
-    // パスワード認証処理（一時的に無効化）
-    /*
-    document.getElementById('passwordSubmit').addEventListener('click', function() {
-        const pw = document.getElementById('accessPassword').value;
+    // パスワード認証処理
+    passwordSubmit.addEventListener('click', function() {
+        const pw = accessPassword.value;
         if (pw === 'maimai') {
             passwordModal.style.display = 'none';
             feedbackForm.style.display = 'block';
             document.querySelector('h1').style.display = 'block';
+            passwordError.style.display = 'none'; // エラーメッセージを隠す
         } else {
-            document.getElementById('passwordError').style.display = 'block';
+            passwordError.style.display = 'block';
         }
     });
     // エンターキーでも送信
-    document.getElementById('accessPassword').addEventListener('keypress', function(e) {
+    accessPassword.addEventListener('keypress', function(e) {
         if (e.which === 13 || e.keyCode === 13) {
-            document.getElementById('passwordSubmit').click();
+            passwordSubmit.click();
         }
     });
-    */
+    
+    // パスワード入力時にエラーメッセージを隠す
+    accessPassword.addEventListener('input', function() {
+        passwordError.style.display = 'none';
+    });
 
     // 過去の投稿履歴を読み込んで表示する関数
     function loadPastReports() {
